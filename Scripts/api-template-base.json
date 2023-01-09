@@ -59,7 +59,7 @@
       }
     ],
     "outputs": {
-        "blobendpointurl": {
+        "connectionRuntimeUrl": {
             "type": "string",
             "value": "[reference(resourceId('Microsoft.Web/connections', parameters('connector_type')),'2018-07-01-preview', 'full').properties.connectionRuntimeUrl]"
     }
