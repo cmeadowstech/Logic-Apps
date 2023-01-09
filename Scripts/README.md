@@ -28,7 +28,7 @@ Make sure you download api-template-base.json alongside this script, as it is us
     The Office 365 Outlook connector shorthand would be office365
 .EXAMPLE
     C:\PS> 
-    <Description of example>
+    .\create-api-arm-template.ps1 -subscriptionId "0620cb41-76ea-45fb-a437-f94f581c1e1a" -location "eastus" -connector "office365"
 .NOTES
     Author: Cody Meadows
     Date:   January 09, 2023
