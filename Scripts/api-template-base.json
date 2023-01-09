@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "connector_type": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "logicAppSystemAssignedIdentityTenantId": {
+            "defaultValue": "",
+            "type": "String",
+            "metadata": {
+                "description": "This can be found in Azure Active Directory under the properties blade"
+            }
+        },
+        "logicAppSystemAssignedIdentityObjectId": {
+            "defaultValue": "",
+            "type": "String",
+            "metadata": {
+                "description": "This can be found under the identity blade on the Logic App"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2018-07-01-preview",
+            "location": "[resourceGroup().location]",
+            "name": "[parameters('connector_type')]",
+            "kind": "V2",
+            "properties": {
+                "api": {
+                    "id": "[concat('subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', parameters('connector_type'))]"
+                },
+                "displayName": "[parameters('connector_type')]",
+                "parameterValues": { 
+                    "ParameterValues": "{ParameterValues}"
+                }
+            }
+        },
+        {
+          "type": "Microsoft.Web/connections/accessPolicies",
+          "apiVersion": "2016-06-01",
+          "name": "[concat(parameters('connector_type'),'/',parameters('logicAppSystemAssignedIdentityObjectId'))]",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+              "[resourceId('Microsoft.Web/connections', parameters('connector_type'))]"
+          ],
+          "properties": {
+              "principal": {
+                  "type": "ActiveDirectory",
+                  "identity": {
+                      "tenantId": "[parameters('logicAppSystemAssignedIdentityTenantId')]",
+                      "objectId": "[parameters('logicAppSystemAssignedIdentityObjectId')]"
+                  }
+              }
+          }
+      }
+    ],
+    "outputs": {
+        "blobendpointurl": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Web/connections', parameters('connector_type')),'2018-07-01-preview', 'full').properties.connectionRuntimeUrl]"
+    }
+  }
+}
+
