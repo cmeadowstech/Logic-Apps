@@ -2,6 +2,8 @@
 
 ## create-api-arm-template.ps1
 
+Make sure you download api-template-base.json alongside this script, as it is used as a base to create the ARM template.
+
 ```powershell
 <#
 .SYNOPSIS
