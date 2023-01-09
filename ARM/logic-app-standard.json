@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": {
-      "type": "string",
-      "metadata": {
-        "description": "The datacenter to use for the deployment."
-      }
-    },
     "environmentName": {
       "type": "string"
     },
@@ -48,7 +42,7 @@
       },
       "kind": "[parameters('kind')]",
       "name": "[parameters('storageName')]",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Environment": "[parameters('environmentName')]",
         "Project": "[parameters('projectName')]"
@@ -58,7 +52,7 @@
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2018-02-01",
       "name": "[parameters('appServicePlanName')]",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "tags": {
         "Environment": "[parameters('environmentName')]",
         "Project": "[parameters('projectName')]"
@@ -74,7 +68,7 @@
       "type": "Microsoft.Web/sites",
       "apiVersion": "2018-11-01",
       "name": "[parameters('logicAppName')]",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
