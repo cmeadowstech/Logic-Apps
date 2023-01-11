@@ -18,11 +18,11 @@ resource "random_integer" "ri" {
 
 variable "prefix" {
   type    = string
-  default = "la"
+  default = "dev"
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.prefix}-rg-${random_integer.ri.result}"
+  name     = "${var.prefix}-rg"
   location = "East US"
 }
 
@@ -49,9 +49,14 @@ resource "azurerm_logic_app_standard" "example" {
   app_service_plan_id        = azurerm_service_plan.asp.id
   storage_account_name       = azurerm_storage_account.storage.name
   storage_account_access_key = azurerm_storage_account.storage.primary_access_key
+  version                    = "~4"
 
   app_settings = {
     "FUNCTIONS_WORKER_RUNTIME"     = "node"
     "WEBSITE_NODE_DEFAULT_VERSION" = "~14"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 }
