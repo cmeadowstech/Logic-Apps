@@ -1,0 +1,229 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "type": "string"
+    },
+    "projectName": {
+      "type": "string"
+    },
+    "logicAppName": {
+      "type": "string"
+    },
+    "appServicePlanName": {
+      "type": "string"
+    },
+    "storageName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 24
+    },
+    "kind": {
+      "type": "string",
+      "defaultValue": "StorageV2"
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "Standard_LRS"
+    },
+    "skuTier": {
+      "type": "string",
+      "defaultValue": "Standard"
+    }
+  },
+  "variables": {
+    "ASE-VNETPrefix": "10.0.0.0/16",
+    "ASE-VNETSubnet1Name": "Subnet-1",
+    "ASE-VNETSubnet1Prefix": "10.0.0.0/24",
+    "ASE-VNETSubnet2Name": "Subnet-2",
+    "ASE-VNETSubnet2Prefix": "10.0.1.0/24",
+    "ASE-WEB-APP-Name": "[concat('ASE-WEB-APP', uniqueString(resourceGroup().id))]",
+    "ASE-Name": "[concat('ASE', uniqueString(resourceGroup().id))]",
+    "ASE-VNET-Name": "[concat('ASE-VNET', uniqueString(resourceGroup().id))]",
+    "ASE-SERVICE-Name": "[concat('ASE-SERVICE', uniqueString(resourceGroup().id))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('ASE-VNET-Name')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2020-05-01",
+      "tags": {
+        "displayName": "ASE-VNET"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('ASE-VNETPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('ASE-VNETSubnet1Name')]",
+            "properties": {
+              "addressPrefix": "[variables('ASE-VNETSubnet1Prefix')]",
+              "delegations": [
+                {
+                  "name": "delegation",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/hostingEnvironments"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('ASE-VNETSubnet2Name')]",
+            "properties": {
+              "addressPrefix": "[variables('ASE-VNETSubnet2Prefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2022-03-01",
+      "type": "Microsoft.Web/hostingEnvironments",
+      "name": "[variables('ASE-Name')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('ASE-VNET-Name'))]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('ASE-SERVICE-Name')))]": "Resource",
+        "[concat('hidden-related:', resourceId('Microsoft.Web/sites', variables('ASE-WEB-APP-Name')))]": "Resource",
+        "displayName": "ASE"
+      },
+      "kind": "ASEV3",
+      "properties": {
+        "name": "[variables('ASE-Name')]",
+        "location": "[resourceGroup().location]",
+        "ipsslAddressCount": 0,
+        "virtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('ASE-VNET-Name'), variables('ASE-VNETSubnet1Name'))]"
+        },
+        "multiSize": "Standard_D2d_v4"
+      }
+    },
+    {
+      "type": "Microsoft.Web/hostingEnvironments/multiRolePools",
+      "apiVersion": "2022-03-01",
+      "name": "[concat(variables('ASE-Name'), '/default')]",
+      "location": "East US",
+      "dependsOn": [
+          "[resourceId('Microsoft.Web/hostingEnvironments', variables('ASE-Name'))]"
+      ],
+      "properties": {
+          "workerSize": "Standard_D2d_v4"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-06-01",
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "tier": "[parameters('skuTier')]"
+      },
+      "kind": "[parameters('kind')]",
+      "name": "[parameters('storageName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-03-01",
+      "name": "[parameters('appServicePlanName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/hostingEnvironments', variables('ASE-Name'))]"
+      ],
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      },
+      "sku": {
+        "name": "I1v2",
+        "tier": "IsolatedV2"
+      },
+      "kind": "app",
+      "properties": {
+        "name": "[variables('ASE-SERVICE-Name')]",
+        "hostingEnvironmentProfile": {
+          "id": "[resourceId('Microsoft.Web/hostingEnvironments', variables('ASE-Name'))]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "name": "[parameters('logicAppName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+      ],
+      "kind": "workflowapp,functionapp",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": {
+        "Environment": "[parameters('environmentName')]",
+        "Project": "[parameters('projectName')]"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "hostingEnvironmentProfile": {
+          "id": "[resourceId('Microsoft.Web/hostingEnvironments', variables('ASE-Name'))]"
+        },
+        "siteConfig": {
+          "netFrameworkVersion": "v4.6",
+          "vnetRouteAllEnabled": true,
+          "appSettings": [
+            {
+              "name": "APP_KIND",
+              "value": "workflowApp"
+            },
+            {
+              "name": "AzureFunctionsJobHost__extensionBundle__id",
+              "value": "Microsoft.Azure.Functions.ExtensionBundle.Workflows"
+            },
+            {
+              "name": "AzureFunctionsJobHost__extensionBundle__version",
+              "value": "[1.*, 2.0.0)"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',concat(listKeys(concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', parameters('storageName')),'2019-06-01').keys[0].value),';EndpointSuffix=core.windows.net')]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "node"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',concat(listKeys(concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', parameters('storageName')),'2019-06-01').keys[0].value),';EndpointSuffix=core.windows.net')]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[parameters('logicAppName')]"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "~14"
+            }
+          ]
+        },
+        "clientAffinityEnabled": false
+      }
+    }
+  ],
+  "outputs": {}
+}
