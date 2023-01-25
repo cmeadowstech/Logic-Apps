@@ -4,9 +4,6 @@
 
 name: (classic) Build and Deploy Logic App. 
 
-env:
-  LA_NAME: 'la-name-324234'
-
 on:
   workflow_dispatch:
     # Trigger the workflow every time the build workflow ran to completion
@@ -56,7 +53,7 @@ jobs:
         inlineScript: |
           $profile = Get-AzWebAppPublishingProfile `
               -ResourceGroupName ${{ secrets.RG_LA }} `
-              -Name ${{ env.LA_NAME }}
+              -Name ${{ secrets.LA_NAME }}
           $profile = $profile.Replace("`r", "").Replace("`n", "")
           Write-Output "::set-output name=profile::$profile"
         azPSVersion: latest
