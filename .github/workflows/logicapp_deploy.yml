@@ -62,5 +62,5 @@ jobs:
       uses: Azure/functions-action@v1
       id: la
       with:
-        app-name: ${{secrets.RG_LA}}
+        app-name: ${{ secrets.LA_NAME }}
         package: './output/logic.zip'
