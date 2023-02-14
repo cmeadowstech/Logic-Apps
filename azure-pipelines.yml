@@ -11,7 +11,22 @@ pool:
 stages:
   - stage: tfvalidate
     jobs:
-      -job: validate
-      continueOnError: false
-      steps:
-        
+      - job: validate
+        continueOnError: false
+        steps:
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform'
+              backendServiceArm: 'CMEADOWS-ADO-SP'
+              backendAzureRmResourceGroupName: 'ado-tf-test'
+              backendAzureRmStorageAccountName: 'adobackend029390'
+              backendAzureRmContainerName: 'tfbackend'
+              backendAzureRmKey: 'EVgq3C4uLs2MJld25Df9kD/NjcGL9XgnBRI1YEN6UyyIC1LEYA5rAMIsHPR39850THC8QhimslSx+AStPyy8lA=='
+
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform'
