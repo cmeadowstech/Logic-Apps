@@ -11,7 +11,7 @@ pool:
 stages:
   - stage: tfvalidate
     jobs:
-      - job: validate
+      - job: DeployTerraformIAC
         continueOnError: false
         steps:
           - task: TerraformTaskV4@4
@@ -38,5 +38,13 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
+              environmentServiceNameAzureRM: 'CMEADOWS-ADO-SP'
+              
+          - task: TerraformTaskV4@4
+            displayName: 'Terraform Apply'
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
               workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
               environmentServiceNameAzureRM: 'CMEADOWS-ADO-SP'
