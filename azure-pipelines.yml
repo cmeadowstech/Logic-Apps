@@ -57,15 +57,15 @@ stages:
         - task: CopyFiles@2
           displayName: 'Copy Files'
           inputs:
-            SourceFolder: 'logic'
+            SourceFolder: '$(System.DefaultWorkingDirectory)/logic'
             Contents: '**'
             TargetFolder: 'project_output'
             
         - task: ArchiveFiles@2
           displayName: 'Create ZIP'
           inputs:
-            rootFolderOrFile: '$(Build.BinariesDirectory)/project_output'
-            includeRootFolder: true
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output/logic'
+            includeRootFolder: false
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
             replaceExistingArchive: true
@@ -76,5 +76,5 @@ stages:
             azureSubscription: 'CMEADOWS-ADO-SP'
             appType: 'functionApp'
             appName: 'dev-la-24055'
-            package: '$(System.DefaultWorkingDirectory)/project_output/*.zip'
+            package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
             deploymentMethod: 'zipDeploy'
