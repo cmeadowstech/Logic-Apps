@@ -32,15 +32,6 @@ stages:
               provider: 'azurerm'
               command: 'validate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
-          
-          - task: TerraformTaskV4@4
-            displayName: 'Terraform Refresh'
-            inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
-              commandOptions: '--refresh-only'
-              environmentServiceNameAzureRM: 'CMEADOWS-ADO-SP'
 
           - task: TerraformTaskV4@4
             displayName: 'Terraform Plan'
