@@ -18,7 +18,7 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
               backendServiceArm: 'CMEADOWS-ADO-SP'
               backendAzureRmResourceGroupName: 'ado-tf-test'
               backendAzureRmStorageAccountName: 'adobackend029390'
@@ -29,4 +29,4 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'validate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)\Terraform'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
