@@ -64,7 +64,7 @@ stages:
         - task: ArchiveFiles@2
           displayName: 'Create ZIP'
           inputs:
-            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output/logic'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output'
             includeRootFolder: false
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
