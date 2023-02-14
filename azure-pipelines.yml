@@ -15,6 +15,7 @@ stages:
         continueOnError: false
         steps:
           - task: TerraformTaskV4@4
+            displayName: 'Terraform Init'
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -26,7 +27,16 @@ stages:
               backendAzureRmKey: 'EVgq3C4uLs2MJld25Df9kD/NjcGL9XgnBRI1YEN6UyyIC1LEYA5rAMIsHPR39850THC8QhimslSx+AStPyy8lA=='
 
           - task: TerraformTaskV4@4
+            displayName: 'Terraform Validate'
             inputs:
               provider: 'azurerm'
               command: 'validate'
               workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
+          
+          - task: TerraformTaskV4@4
+            displayName: 'Terraform Plan'
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
+              environmentServiceNameAzureRM: 'CMEADOWS-ADO-SP'
