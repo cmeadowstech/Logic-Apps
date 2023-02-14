@@ -1,0 +1,40 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:            
+  - stage: AppContent
+    jobs:
+      - job: DeployAppContent
+        continueOnError: false
+        steps:
+        - task: CopyFiles@2
+          displayName: 'Copy Files'
+          inputs:
+            SourceFolder: '$(System.DefaultWorkingDirectory)/logic'
+            Contents: '**'
+            TargetFolder: 'project_output'
+            
+        - task: ArchiveFiles@2
+          displayName: 'Create ZIP'
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+            replaceExistingArchive: true
+            
+        - task: AzureFunctionApp@1
+          displayName: 'ZIP Deploy'
+          inputs:
+            azureSubscription: 'CMEADOWS-ADO-SP'
+            appType: 'functionApp'
+            appName: 'dev-la-20550'
+            package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+            deploymentMethod: 'zipDeploy'
