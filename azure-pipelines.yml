@@ -9,7 +9,7 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
-  - stage: tfvalidate
+  - stage: Terraform
     jobs:
       - job: DeployTerraformIAC
         continueOnError: false
@@ -48,3 +48,33 @@ stages:
               command: 'apply'
               workingDirectory: '$(System.DefaultWorkingDirectory)/Terraform'
               environmentServiceNameAzureRM: 'CMEADOWS-ADO-SP'
+              
+  - stage: AppContent
+    jobs:
+      - job: DeployAppContent
+        continueOnError: false
+        steps:
+        - task: CopyFiles@2
+          displayName: 'Copy Files'
+          inputs:
+            SourceFolder: 'logic'
+            Contents: '**'
+            TargetFolder: 'project_output'
+            
+        - task: ArchiveFiles@2
+          displayName: 'Create ZIP'
+          inputs:
+            rootFolderOrFile: '$(Build.BinariesDirectory)/project_output'
+            includeRootFolder: true
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+            replaceExistingArchive: true
+            
+        - task: AzureFunctionApp@1
+          displayName: 'ZIP Deploy'
+          inputs:
+            azureSubscription: 'CMEADOWS-ADO-SP'
+            appType: 'functionApp'
+            appName: 'dev-la-24055'
+            package: '$(System.DefaultWorkingDirectory)/project_output/*.zip'
+            deploymentMethod: 'zipDeploy'
