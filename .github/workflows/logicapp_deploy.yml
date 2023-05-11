@@ -55,7 +55,7 @@ jobs:
               -ResourceGroupName ${{ secrets.RG_LA }} `
               -Name ${{ secrets.LA_NAME }}
           $profile = $profile.Replace("`r", "").Replace("`n", "")
-          Write-Output "::set-output name=profile::$profile"
+          "profile::$profile" >> $env:GITHUB_ENV
         azPSVersion: latest
 
     - name: Deploy to Azure Logic App
