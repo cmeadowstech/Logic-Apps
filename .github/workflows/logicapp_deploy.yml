@@ -56,10 +56,10 @@ jobs:
               -ResourceGroupName ${{ secrets.RG_LA }} `
               -Name ${{ secrets.LA_NAME }}
           $profile = $profile.Replace("`r", "").Replace("`n", "")
-          "PUBLISH_PROFILE::$profile" >> $env:GITHUB_ENV
+          echo "PUBLISH_PROFILE::$profile" >> "$GITHUB_ENV"
         azPSVersion: latest
         
     - name: Show publish profile
       shell: pwsh
       run: |
-        echo "Hello, World ${{ env.PUBLISH_PROFILE }}"      
+        echo "Hello, World $PUBLISH_PROFILE"      
