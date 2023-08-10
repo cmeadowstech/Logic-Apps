@@ -60,6 +60,6 @@ jobs:
         azPSVersion: latest
         
     - name: Show publish profile
-      shell: pwsh
+      id: step_two
       run: |
         printf "Hello, World $PUBLISH_PROFILE"
