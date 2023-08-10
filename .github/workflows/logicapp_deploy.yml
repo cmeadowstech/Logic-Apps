@@ -70,5 +70,5 @@ jobs:
       with:
         app-name: ${{ secrets.LA_NAME }}
         package: './output/logic.zip'
-        publish-profile: $PROFILE
+        publish-profile: ${{ secrets.PUBLISH_PROFILE }}
         
