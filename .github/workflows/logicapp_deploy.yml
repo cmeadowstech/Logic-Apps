@@ -62,4 +62,4 @@ jobs:
     - name: Show publish profile
       id: step_two
       run: |
-        printf "Hello, World $PUBLISH_PROFILE"
+        printf '%s\n' "Hello, World $PUBLISH_PROFILE"
