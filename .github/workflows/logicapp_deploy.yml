@@ -55,13 +55,14 @@ jobs:
               -ResourceGroupName ${{ secrets.RG_LA }} `
               -Name ${{ secrets.LA_NAME }}
           $profile = $profile.Replace("`r", "").Replace("`n", "")
-          "PUBLISH_PROFILE:test" >> $env:GITHUB_ENV
+          $test = "test"
+          "PUBLISH_PROFILE:$test" >> $env:GITHUB_ENV
         azPSVersion: latest
         
     - name: Show publish profile
       id: show_profile
       run: |
-        echo "Hello, World ${{steps.publishprofile.outputs.PUBLISH_PROFILE}}"
+        echo "Hello, World $PUBLISH_PROFILE"
         
     - name: Set the value
       id: step_one
