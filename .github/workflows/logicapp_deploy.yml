@@ -46,7 +46,6 @@ jobs:
         name: logic
         path: ./output/
 
-
     - name: Get publish Profile
       id: publishprofile
       uses: azure/powershell@v1
@@ -60,6 +59,15 @@ jobs:
         azPSVersion: latest
         
     - name: Show publish profile
-      id: step_two
+      id: show_profile
       run: |
         echo "Hello, World ${{steps.publishprofile.outputs.PUBLISH_PROFILE}}"
+        
+    - name: Set the value
+      id: step_one
+      run: |
+        echo "action_state=yellow" >> "$GITHUB_ENV"
+    - name: Use the value
+      id: step_two
+      run: |
+        printf '%s\n' "$action_state" # This will output 'yellow'
