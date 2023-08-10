@@ -56,19 +56,10 @@ jobs:
               -ResourceGroupName ${{ secrets.RG_LA }} `
               -Name ${{ secrets.LA_NAME }}
           $profile = $profile.Replace("`r", "").Replace("`n", "")
-          "PROFILE::$profile" >> $env:GITHUB_ENV
+          "PUBLISH_PROFILE::$profile" >> $env:GITHUB_ENV
         azPSVersion: latest
         
     - name: Show publish profile
       shell: pwsh
       run: |
-        echo "Hello, World $PROFILE"
-
-    - name: Deploy to Azure Logic App
-      uses: Azure/functions-action@v1
-      id: la
-      with:
-        app-name: ${{ secrets.LA_NAME }}
-        package: './output/logic.zip'
-        publish-profile: ${{ secrets.PUBLISH_PROFILE }}
-        
+        echo "Hello, World $PUBLISH_PROFILE"      
