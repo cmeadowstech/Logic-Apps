@@ -56,7 +56,7 @@ jobs:
               -Name ${{ secrets.LA_NAME }}
           $profile = $profile.Replace("`r", "").Replace("`n", "")
           $TEST_VAR_ENV = "test"
-          "PUBLISH_PROFILE=$TEST_VAR_ENV" >> $env:GITHUB_ENV
+          "PUBLISH_PROFILE=$profile" >> $env:GITHUB_ENV
         azPSVersion: latest
         
     - name: Show publish profile
