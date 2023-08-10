@@ -62,7 +62,7 @@ jobs:
     - name: Show publish profile
       shell: pwsh
       run: |
-        echo "${{PROFILE}}"
+        echo "Hello, World $PROFILE"
 
     - name: Deploy to Azure Logic App
       uses: Azure/functions-action@v1
