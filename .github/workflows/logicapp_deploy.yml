@@ -62,4 +62,4 @@ jobs:
     - name: Show publish profile
       shell: pwsh
       run: |
-        echo "Hello, World ${{env.PUBLISH_PROFILE}}"
+        printf "Hello, World $PUBLISH_PROFILE"
